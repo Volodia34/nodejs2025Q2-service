@@ -1,4 +1,13 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
@@ -11,5 +20,17 @@ export class UserController {
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createUserDto: CreateUserDto): Omit<User, 'password'> {
     return this.userService.create(createUserDto);
+  }
+
+  @Get()
+  findAll(): Omit<User, 'password'>[] {
+    return this.userService.findAll();
+  }
+
+  @Get(':id')
+  findOne(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Omit<User, 'password'> {
+    return this.userService.findOne(id);
   }
 }

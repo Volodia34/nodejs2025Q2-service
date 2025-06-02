@@ -1,4 +1,9 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -27,6 +32,22 @@ export class UserService {
     this.users.push(newUser);
 
     const { password, ...userWithoutPassword } = newUser;
+    return userWithoutPassword;
+  }
+
+  findAll(): Omit<User, 'password'>[] {
+    return this.users.map((user) => {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
+  }
+
+  findOne(id: string): Omit<User, 'password'> {
+    const user = this.users.find((u) => u.id === id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    const { password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 }
