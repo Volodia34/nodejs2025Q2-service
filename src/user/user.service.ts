@@ -2,11 +2,12 @@ import {
   Injectable,
   HttpException,
   HttpStatus,
-  NotFoundException,
+  NotFoundException, ForbiddenException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UserService {
@@ -48,6 +49,35 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
+  updatePassword(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Omit<User, 'password'> {
+    const userIndex = this.users.findIndex(u => u.id === id);
+
+    if (userIndex === -1) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    const user = this.users[userIndex];
+
+    if (user.password !== updatePasswordDto.oldPassword) {
+      throw new ForbiddenException('Old password is wrong');
+    }
+
+    const updatedUser = {
+      ...user,
+      password: updatePasswordDto.newPassword,
+      version: user.version + 1,
+      updatedAt: Date.now(),
+    };
+
+    this.users[userIndex] = updatedUser;
+
+    const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }
 }

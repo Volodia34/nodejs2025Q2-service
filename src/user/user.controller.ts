@@ -7,10 +7,12 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -32,5 +34,13 @@ export class UserController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Omit<User, 'password'> {
     return this.userService.findOne(id);
+  }
+
+  @Put(':id')
+  updatePassword(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ): Omit<User, 'password'> {
+    return this.userService.updatePassword(id, updatePasswordDto);
   }
 }
