@@ -2,7 +2,8 @@ import {
   Injectable,
   HttpException,
   HttpStatus,
-  NotFoundException, ForbiddenException,
+  NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from './entities/user.entity';
@@ -56,7 +57,7 @@ export class UserService {
     id: string,
     updatePasswordDto: UpdatePasswordDto,
   ): Omit<User, 'password'> {
-    const userIndex = this.users.findIndex(u => u.id === id);
+    const userIndex = this.users.findIndex((u) => u.id === id);
 
     if (userIndex === -1) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -79,5 +80,15 @@ export class UserService {
 
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
+  }
+
+  delete(id: string): void {
+    const userIndex = this.users.findIndex((u) => u.id === id);
+
+    if (userIndex === -1) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    this.users.splice(userIndex, 1);
   }
 }
