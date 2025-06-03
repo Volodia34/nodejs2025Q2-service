@@ -3,6 +3,7 @@ import {
   Inject,
   forwardRef,
   UnprocessableEntityException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InMemoryFavoritesStore, Favorites } from './entities/favorites.entity';
 import { ArtistService } from '../artist/artist.service';
@@ -90,5 +91,31 @@ export class FavoritesService {
     } catch (error) {
       throw new UnprocessableEntityException(`Artist with id ${id} not found`);
     }
+  }
+
+  removeTrack(id: string): void {
+    const index = this.favorites.tracks.indexOf(id);
+    if (index === -1) {
+      throw new NotFoundException(`Track with id ${id} not found in favorites`);
+    }
+    this.favorites.tracks.splice(index, 1);
+  }
+
+  removeAlbum(id: string): void {
+    const index = this.favorites.albums.indexOf(id);
+    if (index === -1) {
+      throw new NotFoundException(`Album with id ${id} not found in favorites`);
+    }
+    this.favorites.albums.splice(index, 1);
+  }
+
+  removeArtist(id: string): void {
+    const index = this.favorites.artists.indexOf(id);
+    if (index === -1) {
+      throw new NotFoundException(
+        `Artist with id ${id} not found in favorites`,
+      );
+    }
+    this.favorites.artists.splice(index, 1);
   }
 }
