@@ -9,6 +9,7 @@ import { Album } from './entities/album.entity';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { TrackService } from '../track/track.service';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class AlbumService {
@@ -17,6 +18,8 @@ export class AlbumService {
   constructor(
     @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
   ) {}
 
   create(createAlbumDto: CreateAlbumDto): Album {
@@ -71,6 +74,13 @@ export class AlbumService {
     this.albums.splice(albumIndex, 1);
 
     this.trackService.removeAlbumFromTracks(id);
+    try {
+      this.favoritesService.removeAlbum(id);
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
+    }
   }
 
   removeArtistFromAlbums(artistId: string): void {
