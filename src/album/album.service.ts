@@ -17,4 +17,10 @@ export class AlbumService {
     this.albums.push(newAlbum);
     return newAlbum;
   }
+
+  findAll(): Album[] {
+    return this.albums;
+  }
+
+
 }
