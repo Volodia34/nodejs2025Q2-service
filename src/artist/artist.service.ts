@@ -43,4 +43,12 @@ export class ArtistService {
     this.artists[artistIndex] = updatedArtist;
     return updatedArtist;
   }
+
+  delete(id: string): void {
+    const artistIndex = this.artists.findIndex((a) => a.id === id);
+    if (artistIndex === -1) {
+      throw new NotFoundException(`Artist with ID ${id} not found`);
+    }
+    this.artists.splice(artistIndex, 1);
+  }
 }
