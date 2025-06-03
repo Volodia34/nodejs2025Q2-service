@@ -51,4 +51,20 @@ export class AlbumService {
     this.albums[albumIndex] = updatedAlbum;
     return updatedAlbum;
   }
+
+  delete(id: string): void {
+    const albumIndex = this.albums.findIndex((albumEl) => albumEl.id === id);
+    if (albumIndex === -1) {
+      throw new NotFoundException(`Album with ID ${id} not found`);
+    }
+    this.albums.splice(albumIndex, 1);
+  }
+
+  removeArtistFromAlbums(artistId: string): void {
+    this.albums.forEach((album) => {
+      if (album.artistId === artistId) {
+        album.artistId = null;
+      }
+    });
+  }
 }
