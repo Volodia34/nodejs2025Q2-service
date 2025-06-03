@@ -1,4 +1,9 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InMemoryFavoritesStore, Favorites } from './entities/favorites.entity';
 import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
@@ -47,5 +52,43 @@ export class FavoritesService {
     }
 
     return { artists, albums, tracks };
+  }
+
+  addTrack(id: string): { message: string } {
+    try {
+      this.trackService.findOne(id);
+      if (!this.favorites.tracks.includes(id)) {
+        this.favorites.tracks.push(id);
+      }
+      return { message: `Track with id ${id} successfully added to favorites` };
+    } catch (error) {
+      throw new UnprocessableEntityException(`Track with id ${id} not found`);
+    }
+  }
+
+  addAlbum(id: string): { message: string } {
+    try {
+      this.albumService.findOne(id);
+      if (!this.favorites.albums.includes(id)) {
+        this.favorites.albums.push(id);
+      }
+      return { message: `Album with id ${id} successfully added to favorites` };
+    } catch (error) {
+      throw new UnprocessableEntityException(`Album with id ${id} not found`);
+    }
+  }
+
+  addArtist(id: string): { message: string } {
+    try {
+      this.artistService.findOne(id);
+      if (!this.favorites.artists.includes(id)) {
+        this.favorites.artists.push(id);
+      }
+      return {
+        message: `Artist with id ${id} successfully added to favorites`,
+      };
+    } catch (error) {
+      throw new UnprocessableEntityException(`Artist with id ${id} not found`);
+    }
   }
 }
