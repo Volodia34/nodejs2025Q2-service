@@ -3,6 +3,7 @@ import { FavoritesService } from './favorites.service';
 import { ArtistModule } from '../artist/artist.module';
 import { AlbumModule } from '../album/album.module';
 import { TrackModule } from '../track/track.module';
+import { FavoritesController } from './favorites.controller';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { TrackModule } from '../track/track.module';
     forwardRef(() => AlbumModule),
     forwardRef(() => TrackModule),
   ],
+  controllers: [FavoritesController],
   providers: [FavoritesService],
   exports: [FavoritesService],
 })
