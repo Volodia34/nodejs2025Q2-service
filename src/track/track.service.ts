@@ -20,4 +20,8 @@ export class TrackService {
     this.tracks.push(newTrack);
     return newTrack;
   }
+
+  findAll(): Track[] {
+    return this.tracks;
+  }
 }
