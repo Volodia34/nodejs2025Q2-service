@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 
-
 @Injectable()
 export class TrackService {
   private tracks: Track[] = [];
@@ -56,5 +55,29 @@ export class TrackService {
 
     this.tracks[trackIndex] = updatedTrack;
     return updatedTrack;
+  }
+
+  delete(id: string): void {
+    const trackIndex = this.tracks.findIndex((t) => t.id === id);
+    if (trackIndex === -1) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    this.tracks.splice(trackIndex, 1);
+  }
+
+  removeArtistFromTracks(artistId: string): void {
+    this.tracks.forEach((track) => {
+      if (track.artistId === artistId) {
+        track.artistId = null;
+      }
+    });
+  }
+
+  removeAlbumFromTracks(albumId: string): void {
+    this.tracks.forEach((track) => {
+      if (track.albumId === albumId) {
+        track.albumId = null;
+      }
+    });
   }
 }
