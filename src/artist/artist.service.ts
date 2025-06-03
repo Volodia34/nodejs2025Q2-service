@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Artist } from './entities/artist.entity';
 import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Injectable()
 export class ArtistService {
@@ -27,5 +28,19 @@ export class ArtistService {
       throw new NotFoundException(`Artist with ID ${id} not found`);
     }
     return artist;
+  }
+
+  update(id: string, updateArtistDto: UpdateArtistDto): Artist {
+    const artistIndex = this.artists.findIndex((a) => a.id === id);
+    if (artistIndex === -1) {
+      throw new NotFoundException(`Artist with ID ${id} not found`);
+    }
+
+    const updatedArtist = {
+      ...this.artists[artistIndex],
+      ...updateArtistDto,
+    };
+    this.artists[artistIndex] = updatedArtist;
+    return updatedArtist;
   }
 }
