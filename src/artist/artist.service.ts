@@ -9,6 +9,7 @@ import { Artist } from './entities/artist.entity';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { AlbumService } from '../album/album.service';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class ArtistService {
@@ -17,6 +18,8 @@ export class ArtistService {
   constructor(
     @Inject(forwardRef(() => AlbumService))
     private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
   ) {}
 
   create(createArtistDto: CreateArtistDto): Artist {
@@ -63,5 +66,6 @@ export class ArtistService {
     this.artists.splice(artistIndex, 1);
 
     this.albumService.removeArtistFromAlbums(id);
+    this.trackService.removeArtistFromTracks(id);
   }
 }
