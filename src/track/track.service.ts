@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Track } from './entities/track.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -23,5 +23,13 @@ export class TrackService {
 
   findAll(): Track[] {
     return this.tracks;
+  }
+
+  findOne(id: string): Track {
+    const track = this.tracks.find((t) => t.id === id);
+    if (!track) {
+      throw new NotFoundException(`Track with ID ${id} not found`);
+    }
+    return track;
   }
 }
