@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Album } from './entities/album.entity';
 import { CreateAlbumDto } from './dto/create-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Injectable()
 export class AlbumService {
@@ -29,5 +30,25 @@ export class AlbumService {
       throw new NotFoundException(`Album with ID ${id} not found`);
     }
     return album;
+  }
+
+  update(id: string, updateAlbumDto: UpdateAlbumDto): Album {
+    const albumIndex = this.albums.findIndex((a) => a.id === id);
+    if (albumIndex === -1) {
+      throw new NotFoundException(`Album with ID ${id} not found`);
+    }
+
+    const existingAlbum = this.albums[albumIndex];
+    const updatedAlbum = {
+      ...existingAlbum,
+      ...updateAlbumDto,
+    };
+
+    if (updateAlbumDto.hasOwnProperty('artistId')) {
+      updatedAlbum.artistId = updateAlbumDto.artistId;
+    }
+
+    this.albums[albumIndex] = updatedAlbum;
+    return updatedAlbum;
   }
 }
