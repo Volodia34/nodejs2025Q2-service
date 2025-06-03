@@ -16,4 +16,8 @@ export class ArtistService {
     this.artists.push(newArtist);
     return newArtist;
   }
+
+  findAll(): Artist[] {
+    return this.artists;
+  }
 }
