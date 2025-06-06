@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -24,8 +24,10 @@ export class User {
   version: number;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
+  @Transform(({ value }) => value.getTime())
   createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
+  @Transform(({ value }) => value.getTime())
   updatedAt: Date;
 }

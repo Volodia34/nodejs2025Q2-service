@@ -9,6 +9,8 @@ import {
   ParseUUIDPipe,
   Put,
   Delete,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,38 +18,43 @@ import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto): Omit<User, 'password'> {
-    return this.userService.create(createUserDto);
+  async create(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<Omit<User, 'password'>> {
+    return await this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll(): Omit<User, 'password'>[] {
-    return this.userService.findAll();
+  async findAll(): Promise<Omit<User, 'password'>[]> {
+    return await this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(
+  async findOne(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-  ): Omit<User, 'password'> {
-    return this.userService.findOne(id);
+  ): Promise<Omit<User, 'password'>> {
+    return await this.userService.findOne(id);
   }
 
   @Put(':id')
-  updatePassword(
+  async updatePassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ): Omit<User, 'password'> {
-    return this.userService.updatePassword(id, updatePasswordDto);
+  ): Promise<Omit<User, 'password'>> {
+    return await this.userService.updatePassword(id, updatePasswordDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string): void {
-    return this.userService.delete(id);
+  async delete(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<void> {
+    await this.userService.delete(id);
   }
 }
