@@ -1,12 +1,7 @@
 import { Album } from '../../album/entities/album.entity';
 import { Artist } from '../../artist/entities/artist.entity';
 import { Track } from '../../track/entities/track.entity';
-import {
-  Entity,
-  JoinColumn,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('favorites')
 export class Favorites {
@@ -14,21 +9,14 @@ export class Favorites {
   id: string;
 
   @ManyToMany(() => Artist, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinTable()
   artists: Artist[];
 
   @ManyToMany(() => Album, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinTable()
   albums: Album[];
 
   @ManyToMany(() => Track, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn()
+  @JoinTable()
   tracks: Track[];
 }
-
-export const InMemoryFavoritesStore: Favorites = {
-  id: '',
-  artists: [],
-  albums: [],
-  tracks: [],
-};

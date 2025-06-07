@@ -55,14 +55,13 @@ export class AlbumService {
 
   async delete(id: string): Promise<void> {
     const result = await this.albumRepository.delete(id);
-
     if (result.affected === 0) {
       throw new NotFoundException(`Album with ID ${id} not found`);
     }
 
-    this.trackService.removeAlbumFromTracks(id);
+    await this.trackService.removeAlbumFromTracks(id);
     try {
-      this.favoritesService.removeAlbum(id);
+      await this.favoritesService.removeAlbum(id);
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error;

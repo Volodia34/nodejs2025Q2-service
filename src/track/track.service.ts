@@ -54,7 +54,7 @@ export class TrackService {
       throw new NotFoundException(`Track with ID ${id} not found`);
     }
     try {
-      this.favoritesService.removeTrack(id);
+      await this.favoritesService.removeTrack(id);
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error;

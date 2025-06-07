@@ -58,16 +58,14 @@ export class ArtistService {
 
   async delete(id: string): Promise<void> {
     const result = await this.artistRepository.delete(id);
-
     if (result.affected === 0) {
       throw new NotFoundException(`Artist with ID ${id} not found`);
     }
 
-    this.albumService.removeArtistFromAlbums(id);
-    this.trackService.removeArtistFromTracks(id);
-
+    await this.albumService.removeArtistFromAlbums(id);
+    await this.trackService.removeArtistFromTracks(id);
     try {
-      this.favoritesService.removeArtist(id);
+      await this.favoritesService.removeArtist(id);
     } catch (error) {
       if (!(error instanceof NotFoundException)) {
         throw error;
