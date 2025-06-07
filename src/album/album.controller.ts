@@ -21,31 +21,35 @@ export class AlbumController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createAlbumDto: CreateAlbumDto): Album {
-    return this.albumService.create(createAlbumDto);
+  async create(@Body() createAlbumDto: CreateAlbumDto): Promise<Album> {
+    return await this.albumService.create(createAlbumDto);
   }
 
   @Get()
-  findAll(): Album[] {
-    return this.albumService.findAll();
+  async findAll(): Promise<Album[]> {
+    return await this.albumService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string): Album {
-    return this.albumService.findOne(id);
+  async findOne(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<Album> {
+    return await this.albumService.findOne(id);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
-  ): Album {
-    return this.albumService.update(id, updateAlbumDto);
+  ): Promise<Album> {
+    return await this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string): void {
-    return this.albumService.delete(id);
+  async delete(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<void> {
+    return await this.albumService.delete(id);
   }
 }
