@@ -5,11 +5,11 @@ Welcome to the Home Library Service! This service is a RESTful API built with No
 ## Table of Contents
 
 - [Key Features](#key-features)
-- [Prerequisites](#prerequisites)
+- [Requirements](#system-requirements)
 - [Downloading the Project](#downloading-the-project)
 - [Installation](#installation)
 - [Environment Configuration](#environment-configuration)
-- [Running the Application](#running-the-application)
+- [Running the Application](#running-the-application-with-docker)
 - [API Usage Guide](#api-usage-guide)
     - [Main Resources](#main-resources)
     - [Authentication and Authorization](#authentication-and-authorization)
@@ -27,14 +27,12 @@ Welcome to the Home Library Service! This service is a RESTful API built with No
 - Input data validation
 - Detailed API documentation via Swagger (OpenAPI)
 
-## Prerequisites
+## System Requirements
 
-Before you begin, ensure you have met the following requirements:
+The primary requirement to run this project is Docker.
 
-- **Git**: You'll need Git to clone the repository. [Download & Install Git](https://git-scm.com/downloads)
-- **Node.js**: Required to run the application
-    - Recommended version: `>=22.14.0` (as specified in the `engines` field in `package.json`)
-    - [Download & Install Node.js](https://nodejs.org/en/download/)
+- **Docker**: You must have Docker and Docker Compose installed. [Download & Install Docker](https://www.docker.com/products/docker-desktop/)
+- **Node.js**: Required only if you want to run tests or the application locally without Docker. Recommended version `>=22.14.0`.
 
 ## Downloading the Project
 
@@ -53,43 +51,48 @@ npm install
 
 ## Environment Configuration
 
-The application uses environment variables for configuration, loaded from a `.env` file.
+The application requires a `.env` file in the root directory for configuration.
 
-1. In the root directory of the project, create a file named `.env`.
-2. Add the required environment variables. For example:
+1.  Create a file named `.env`. It's recommended to copy `.env.example` if it exists.
+2.  Fill it with the necessary variables:
 
-```env
-PORT=4000
-```
+    ```env
+    PORT=4000
 
-If not specified, the service will default to port `4000`.
+    # PostgreSQL Connection Settings for Docker
+    POSTGRES_HOST=postgres-db
+    POSTGRES_PORT=5432
+    POSTGRES_USER=myuser
+    POSTGRES_PASSWORD=mypassword
+    POSTGRES_DB=mydatabase
 
-> ⚠️ Do **not** commit the `.env` file to version control. Ensure it's in your `.gitignore`.
+    # JWT Secrets - IMPORTANT: change these to your own secure random strings
+    JWT_SECRET_KEY=your-super-secret-key
+    JWT_SECRET_REFRESH_KEY=your-super-secret-refresh-key
+    TOKEN_EXPIRE_TIME=1h
+    TOKEN_REFRESH_EXPIRE_TIME=24h
+    ```
+> ⚠️ **Note:** The `.env` file should be listed in your `.gitignore` and must not be committed to the repository.
 
-## Running the Application
+## Running the Application with Docker
 
-Available scripts:
+This is the recommended way to run the project. It automatically sets up the application and the PostgreSQL database in containers.
 
-- **Development mode (with hot-reload):**
+1.  **Build and Run Containers**
+    Execute the following command in your terminal. This will build the application's Docker image and start both the app and database containers.
+    ```bash
+    docker-compose up --build
+    ```
+    To run in the background (detached mode), add the `-d` flag:
+    ```bash
+    docker-compose up --build -d
+    ```
 
-```bash
-npm run start:dev
-```
-
-- **Standard start (NestJS default):**
-
-```bash
-npm start
-```
-
-- **Production mode:**
-
-```bash
-npm run build
-npm run start:prod
-```
-
-The app will run at e.g., `http://localhost:4000`.
+2.  **Stopping the Application**
+    To stop and remove the containers, press `Ctrl + C` (if not in detached mode) and then run:
+    ```bash
+    docker-compose down
+    
 
 ## API Usage Guide
 
@@ -124,13 +127,9 @@ Refer to Swagger docs for detailed DTOs and expected responses.
 
 ### API Documentation (Swagger/OpenAPI)
 
-Interactive Swagger documentation is available at:
+Once the application is running via Docker, the interactive API documentation is available at:
 
-```
-http://localhost:PORT/doc/
-```
-
-Example: `http://localhost:4000/doc/`
+-   **URL:** [`http://localhost:4000/doc`](http://localhost:4000/doc)
 
 ## Testing
 
