@@ -8,6 +8,7 @@ import { TrackModule } from './track/track.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MyLogger } from './logger/MyLogger';
 
 @Module({
   imports: [
@@ -35,6 +36,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     FavoritesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MyLogger],
 })
 export class AppModule {}
