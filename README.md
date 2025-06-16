@@ -58,6 +58,9 @@ The application requires a `.env` file in the root directory for configuration.
 
     ```env
     PORT=4000
+    
+    # Logging Levels: 0 for error, 1 for warn, 2 for log, 3 for debug, 4 for verbose
+    LOG_LEVEL=3
 
     # PostgreSQL Connection Settings for Docker
     POSTGRES_HOST=postgres-db
