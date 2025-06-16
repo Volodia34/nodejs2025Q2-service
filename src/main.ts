@@ -5,12 +5,19 @@ import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
 import { readFileSync, existsSync } from 'fs';
 import * as YAML from 'js-yaml';
 import { join } from 'path';
+import { MyLogger } from './logger/MyLogger';
+import { AllExceptionsFilter } from './exception/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
   const port = process.env.PORT || 4000;
+
+  const logger = app.get(MyLogger);
+  app.useLogger(logger);
+
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
 
   try {
     const swaggerFilePath = join(__dirname, '..', 'doc', 'api.yaml');
