@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -34,6 +38,23 @@ export class AuthService {
     }
 
     return this.generateTokens(user);
+  }
+
+  async refreshTokens(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
+      });
+
+      const user = await this.userService.findOne(payload.userId);
+      if (!user) {
+        throw new ForbiddenException('Access Denied');
+      }
+
+      return this.generateTokens(user);
+    } catch (error) {
+      throw new ForbiddenException('Invalid or expired refresh token');
+    }
   }
 
   private async generateTokens(user: User) {

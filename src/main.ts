@@ -1,12 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MyLogger } from './logger/MyLogger';
-import { AllExceptionsFilter } from './exception/exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
 import * as YAML from 'js-yaml';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { MyLogger } from './logger/MyLogger';
+import { AllExceptionsFilter } from './exception/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -33,7 +33,6 @@ async function bootstrap() {
   });
 
   app.useGlobalFilters(new AllExceptionsFilter(logger));
-
   app.useGlobalPipes(new ValidationPipe());
 
   try {
@@ -59,7 +58,13 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT || 4000;
-  await app.listen(port);
+  await app.listen(port, () => {
+    logger.log(`App is running on http://localhost:${port}`, 'Bootstrap');
+    logger.log(
+      `Swagger UI is available at http://localhost:${port}/doc`,
+      'Bootstrap',
+    );
+  });
 }
 
 bootstrap();
