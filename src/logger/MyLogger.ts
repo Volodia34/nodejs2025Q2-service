@@ -12,12 +12,14 @@ export class MyLogger extends ConsoleLogger {
     'debug',
     'verbose',
   ];
-  private currentLogLevel: number;
+  private maxFileSize: number;
 
   constructor() {
     super();
-    this.currentLogLevel = parseInt(process.env.LOG_LEVEL, 10) || 3;
-    this.setLogLevels(MyLogger.LOG_LEVELS.slice(0, this.currentLogLevel + 1));
+    const logLevel = parseInt(process.env.LOG_LEVEL, 10) || 3;
+    this.setLogLevels(MyLogger.LOG_LEVELS.slice(0, logLevel + 1));
+    this.maxFileSize =
+      (parseInt(process.env.LOG_FILE_MAX_SIZE, 10) || 10) * 1024; // in bytes
 
     if (!fs.existsSync(MyLogger.LOGS_DIR)) {
       fs.mkdirSync(MyLogger.LOGS_DIR, { recursive: true });
@@ -28,10 +30,31 @@ export class MyLogger extends ConsoleLogger {
     return path.join(MyLogger.LOGS_DIR, `${type}.log`);
   }
 
-  private writeToFile(filePath: string, message: string) {
-    fs.appendFileSync(filePath, message + '\n', 'utf8');
+  private rotateLogFile(filePath: string) {
+    try {
+      if (
+        fs.existsSync(filePath) &&
+        fs.statSync(filePath).size > this.maxFileSize
+      ) {
+        const timestamp = new Date().toISOString().replace(/:/g, '-');
+        const newPath = filePath.replace('.log', `-${timestamp}.log`);
+        fs.renameSync(filePath, newPath);
+      }
+    } catch (err) {
+      console.error('Failed to rotate log file:', err);
+    }
   }
 
+  private writeToFile(filePath: string, message: string) {
+    this.rotateLogFile(filePath);
+    try {
+      fs.appendFileSync(filePath, message + '\n', 'utf8');
+    } catch (err) {
+      console.error('Failed to write to log file:', err);
+    }
+  }
+
+  // log, error, warn, debug, verbose methods remain the same
   log(message: any, context?: string) {
     if (!this.isLevelEnabled('log')) return;
     super.log(message, context);
