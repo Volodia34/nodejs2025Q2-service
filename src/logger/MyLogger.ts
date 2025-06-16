@@ -54,7 +54,6 @@ export class MyLogger extends ConsoleLogger {
     }
   }
 
-  // log, error, warn, debug, verbose methods remain the same
   log(message: any, context?: string) {
     if (!this.isLevelEnabled('log')) return;
     super.log(message, context);
