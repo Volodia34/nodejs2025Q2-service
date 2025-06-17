@@ -4,21 +4,18 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { ConfigService } from '@nestjs/config';
 import { User } from 'src/user/entities/user.entity';
+import * as process from 'node:process';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
-    const saltRounds = parseInt(
-      this.configService.get<string>('CRYPT_SALT') || '10',
-    );
+    const saltRounds = parseInt(process.env.CRYPT_SALT || '10');
     const hashedPassword = await bcrypt.hash(
       createUserDto.password,
       saltRounds,
@@ -51,7 +48,7 @@ export class AuthService {
   async refreshTokens(refreshToken: string) {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'), // Use configService instead of process.env
+        secret: process.env.JWT_SECRET_REFRESH_KEY,
       });
 
       const user = await this.userService.findOneByLogin(payload.login);
@@ -69,13 +66,13 @@ export class AuthService {
     const payload = { userId: user.id, login: user.login };
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET_KEY'),
-      expiresIn: this.configService.get<string>('TOKEN_EXPIRE_TIME'),
+      secret: process.env.JWT_SECRET_KEY,
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
-      expiresIn: this.configService.get<string>('TOKEN_REFRESH_EXPIRE_TIME'),
+      secret: process.env.JWT_SECRET_REFRESH_KEY,
+      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
     });
 
     return {

@@ -18,6 +18,7 @@ import { LoggingMiddleware } from './logger/middleware/logging.middleware';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

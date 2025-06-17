@@ -19,7 +19,6 @@ COPY package*.json ./
 RUN npm install --only=production --legacy-peer-deps
 
 COPY --from=builder /usr/src/app/doc ./doc
-
 COPY --from=builder /usr/src/app/dist ./dist
 
 EXPOSE 4000
