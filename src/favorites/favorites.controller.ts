@@ -6,12 +6,14 @@ import {
   Param,
   HttpCode,
   HttpStatus,
-  ParseUUIDPipe,
+  ParseUUIDPipe, UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { FavoritesResponseDto } from './dto/favorites-response.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('favs')
+@UseGuards(JwtAuthGuard)
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
