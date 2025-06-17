@@ -8,12 +8,14 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
+    private configService: ConfigService,
   ) {
     super();
   }
@@ -28,38 +30,27 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (isPublic) {
       return true;
     }
-
     const req = context.switchToHttp().getRequest();
-
-    // Check for special test header to bypass auth in specific test cases
-    if (req.headers['x-test-auth-bypass'] === 'true') {
-      return true;
-    }
-
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-      throw new UnauthorizedException('Authorization header is missing');
+      throw new UnauthorizedException();
     }
 
     const [type, token] = authHeader.split(' ');
 
-    if (type !== 'Bearer') {
-      throw new UnauthorizedException('Bearer token is required');
-    }
-
-    if (!token) {
-      throw new UnauthorizedException('Token is missing');
+    if (type !== 'Bearer' || !token) {
+      throw new UnauthorizedException();
     }
 
     try {
       const payload = this.jwtService.verify(token, {
-        secret: process.env.JWT_SECRET_KEY,
+        secret: this.configService.get<string>('JWT_SECRET_KEY'),
       });
       req.user = payload;
       return true;
     } catch (e) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException();
     }
   }
 }

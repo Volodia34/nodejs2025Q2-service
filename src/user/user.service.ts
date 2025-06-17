@@ -19,12 +19,6 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Omit<User, 'password'>> {
-    const existingUser = await this.userRepository.findOneBy({
-      login: createUserDto.login,
-    });
-    if (existingUser) {
-      throw new ConflictException('Login already exists');
-    }
 
     const newUser = this.userRepository.create(createUserDto);
 
@@ -65,16 +59,22 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
+    if (!user.password) {
+      throw new ForbiddenException('Cannot update password');
+    }
+
     const isPasswordMatch = await bcrypt.compare(
       updatePasswordDto.oldPassword,
       user.password,
     );
+
     if (!isPasswordMatch) {
-      throw new ForbiddenException('Old password is wrong');
+      throw new ForbiddenException('Old password is incorrect');
     }
 
     const salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(updatePasswordDto.newPassword, salt);
+
     return this.userRepository.save(user);
   }
 
