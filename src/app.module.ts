@@ -8,11 +8,11 @@ import { TrackModule } from './track/track.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MyLogger } from './logger/MyLogger';
-import { LoggingMiddleware } from './logger/logging.middleware';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { MyLogger } from './logger/custom-logger.service';
+import { LoggingMiddleware } from './logger/middleware/logging.middleware';
 
 @Module({
   imports: [

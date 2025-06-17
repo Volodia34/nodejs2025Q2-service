@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { MyLogger } from '../logger/MyLogger';
+import { MyLogger } from '../logger/custom-logger.service';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -31,13 +31,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
     )} - Path: ${request.method} ${request.url}`;
 
-    this.logger.error(logMessage, exception instanceof Error ? exception.stack : '', 'ExceptionFilter');
+    this.logger.error(
+      logMessage,
+      exception instanceof Error ? exception.stack : '',
+      'ExceptionFilter',
+    );
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      ... (typeof message === 'object' ? message : { message }),
+      ...(typeof message === 'object' ? message : { message }),
     });
   }
 }

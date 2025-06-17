@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -20,21 +16,33 @@ export class AuthService {
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const saltRounds = parseInt(
+      this.configService.get<string>('CRYPT_SALT') || '10',
+    );
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      saltRounds,
+    );
+
+    return this.userService.create({
+      login: createUserDto.login,
+      password: hashedPassword,
+    });
   }
 
-  async login(loginDto: LoginDto) {
-    const user = await this.userService.findOneByLogin(loginDto.login);
+  async login(loginUserDto: LoginDto) {
+    const user = await this.userService.findOneByLogin(loginUserDto.login);
     if (!user) {
-      throw new UnauthorizedException('Authentication failed');
+      throw new ForbiddenException('Invalid credentials');
     }
 
-    const isPasswordMatch = await bcrypt.compare(
-      loginDto.password,
+    const isPasswordMatching = await bcrypt.compare(
+      loginUserDto.password,
       user.password,
     );
-    if (!isPasswordMatch) {
-      throw new UnauthorizedException('Authentication failed');
+
+    if (!isPasswordMatching) {
+      throw new ForbiddenException('Invalid credentials');
     }
 
     return this.generateTokens(user);
@@ -43,16 +51,16 @@ export class AuthService {
   async refreshTokens(refreshToken: string) {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'),
+        secret: this.configService.get<string>('JWT_SECRET_REFRESH_KEY'), // Use configService instead of process.env
       });
 
-      const user = await this.userService.findOne(payload.userId);
+      const user = await this.userService.findOneByLogin(payload.login);
       if (!user) {
-        throw new ForbiddenException('Access Denied');
+        throw new ForbiddenException('User not found');
       }
 
       return this.generateTokens(user);
-    } catch (error) {
+    } catch (e) {
       throw new ForbiddenException('Invalid or expired refresh token');
     }
   }
